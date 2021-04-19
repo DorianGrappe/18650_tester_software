@@ -12,7 +12,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.widgets import Slider, Button, RadioButtons
 import matplotlib.pyplot as plt
-from battery_tester import tester
+# from battery_tester import tester
+import tester
 
 
 class TesterOutline(tk.Tk):
