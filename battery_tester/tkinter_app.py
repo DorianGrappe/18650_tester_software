@@ -119,8 +119,9 @@ class TesterOutline(tk.Tk):
                     )
 
             # calculate conditions to see in what case we are
-            waiting_battery = df_values.voltage.values[-1] <= 2
-            inserted_discharged_battery = np.all(df_session.testing.values == False)
+            waiting_battery = df_values.voltage.values[-1] <= 1
+            charging = ( (df_session.testing.values[-1] == False) and ((df_session.voltage.values[-1] >= 2.7))
+            inserted_discharged_battery = np.all(df_session.voltage <= 2.7)
             finished_test = (
                 df_session.testing.values[-1] == False
                 and df_session.testing.values[0] == True
@@ -129,8 +130,11 @@ class TesterOutline(tk.Tk):
 
             if waiting_battery:
                 write_text('Waiting for battery', slot_id)
+            elif charging:
+                write_text('Charging', slot_id)
             elif inserted_discharged_battery:
-                write_text('The inserted battery is \nnot fully charged \ntest not starting', slot_id)
+                write_text('The inserted battery is too low to be charged', slot_id)
+                
             elif finished_test:
                 text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 1)) + "mAh"
                 write_text(text, slot_id)
