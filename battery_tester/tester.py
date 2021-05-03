@@ -171,7 +171,8 @@ def main_function(csv_file='output/measures.csv'):
         
         # we read the voltage of the battery
         voltage = read_voltage(slot_id, slot_infos, mcp)
-
+        import pdb
+        pdb.set_trace()
         last_measure = df_slots_history[df_slots_history.slot_id == slot_id].tail(1)
         last_testing_session = last_measure.testing_session.values[0]
         last_testing = bool(last_measure.testing.values[0])
@@ -179,7 +180,7 @@ def main_function(csv_file='output/measures.csv'):
         last_mah = float(last_measure.spent_mah.values[0])
         mah = 0
 
-        if size(df_slots_history[df_slots_history.slot_id == slot_id]) >= 12 ):
+        if (size(df_slots_history[df_slots_history.slot_id == slot_id]) >= 12 ):
             # Recuperation des points n-10;n-9;n-8 et n-2;n-1;n
             last_values = df_slots_history[df_slots_history.slot_id == slot_id].tail(12)
             n_12 = last_values[11]
@@ -209,7 +210,7 @@ def main_function(csv_file='output/measures.csv'):
             and (last_voltage <= voltage_empty_slot)):
         
         #  is it a new one ?
-            if not ( voltage >= (former_cell_value - 0.1) )
+            if not (( voltage >= (former_cell_value - 0.1) )
                 and ( voltage <= (former_cell_value + 0.1) )):
                 last_testing_session = float(last_testing_session) + 1
                 last_testing = False
@@ -281,11 +282,11 @@ def main_function(csv_file='output/measures.csv'):
             and (voltage > too_low_voltage)
             and (stagne[slot_id] == True)
         ):
-        close_relay(slot_id)
-        charged_once[slot_id] = True
-        last_testing = False
-        stagne[slot_id] = False
-        print("Case 3, End of charge")
+            close_relay(slot_id, slot_infos)
+            charged_once[slot_id] = True
+            last_testing = False
+            stagne[slot_id] = False
+            print("Case 3, End of charge")
 
 
         # ============= Case 4 ==================
@@ -301,8 +302,8 @@ def main_function(csv_file='output/measures.csv'):
             and (already_tested[slot_id] == False)
         ):
 
-        close_relay(slot_id, slot_infos)
-        print("Discharging", last_voltage, voltage, last_testing)
+            close_relay(slot_id, slot_infos)
+            print("Discharging", last_voltage, voltage, last_testing)
 
 
         # ============= Case 5 ==================
@@ -379,7 +380,7 @@ def main_function(csv_file='output/measures.csv'):
         # - empty slot
        
         elif (
-            (voltage =< voltage_empty_slot)
+            (voltage <= voltage_empty_slot)
             and (charged_twice[slot_id] == True)
             
         ):

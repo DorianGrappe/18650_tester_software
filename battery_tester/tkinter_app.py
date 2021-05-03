@@ -120,8 +120,8 @@ class TesterOutline(tk.Tk):
 
             # calculate conditions to see in what case we are
             waiting_battery = df_values.voltage.values[-1] <= 1
-            charging = ( (df_session.testing.values[-1] == False) and ((df_session.voltage.values[-1] >= 2.7))
-            inserted_discharged_battery = np.all(df_session.voltage <= 2.7)
+            charging = ((df_session.testing.values[-1] == False) and (df_session.voltage.values[-1] >= 2.7))
+            inserted_discharged_battery = df_session.voltage.values[-1] > 2.5
             finished_test = (
                 df_session.testing.values[-1] == False
                 and df_session.testing.values[0] == True
