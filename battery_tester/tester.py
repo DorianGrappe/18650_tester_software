@@ -30,7 +30,7 @@ voltage_empty_slot = 1
 # voltage under which the cell won't be charged 
 too_low_voltage = 2.9
 # nb of slot test
-nb_slot = 4
+nb_slot = 5
 
 # has the cell already been charged
 already_tested = [False]*nb_slot
@@ -136,8 +136,7 @@ def relays_initialization(slot_infos, mcp, csv_file):
                 df.T.to_csv(csv_file, index=False)
 
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-    return 
-    story
+    return df_slots_history
 
 
 def main_function(csv_file='output/measures.csv'):
@@ -171,8 +170,6 @@ def main_function(csv_file='output/measures.csv'):
         
         # we read the voltage of the battery
         voltage = read_voltage(slot_id, slot_infos, mcp)
-        import pdb
-        pdb.set_trace()
         last_measure = df_slots_history[df_slots_history.slot_id == slot_id].tail(1)
         last_testing_session = last_measure.testing_session.values[0]
         last_testing = bool(last_measure.testing.values[0])
@@ -263,7 +260,7 @@ def main_function(csv_file='output/measures.csv'):
             and (charged_twice[slot_id] == False)
             ):
 
-            print("Case 1, Insert a cell")
+            print("Case 2, Insert a cell")
             if last_testing:
                 print("test interrupted")
                 last_testing = False
