@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 import sys
 import os.path
+import numpy as np
 
 
 try:
@@ -34,8 +35,6 @@ nb_slot = 5
 
 # has the cell already been charged
 already_tested = [False]*nb_slot
-# has the cell already been tested
-charged_once = [False]*nb_slot
 # cell ready to be unpluged
 charged_twice = [False]*nb_slot
 
@@ -177,21 +176,6 @@ def main_function(csv_file='output/measures.csv'):
         last_mah = float(last_measure.spent_mah.values[0])
         mah = 0
 
-        if (size(df_slots_history[df_slots_history.slot_id == slot_id]) >= 12 ):
-            # Recuperation des points n-10;n-9;n-8 et n-2;n-1;n
-            last_values = df_slots_history[df_slots_history.slot_id == slot_id].tail(12)
-            n_12 = last_values[11]
-            n_11 = last_values[10]
-            n_10 = last_values[9]
-            n_2 = last_values[1]
-            n_1 = last_values[0]
-
-            # we check if the cell is still charging or not
-            variation = abs((n_12+2*n_11+n_10)/4 -(n_2+2*n_1+voltage)/4)
-
-            if (variation < 0.3):
-                stagne[slot_id] = True
-
         
 
         # =============  ==================
@@ -224,8 +208,7 @@ def main_function(csv_file='output/measures.csv'):
     
         if (
             (voltage > too_low_voltage)
-            and (charged_once[slot_id] == False)
-            and (stagne[slot_id] == False)):
+            ):
 
             open_relay(slot_id)
             last_testing = False
@@ -269,20 +252,14 @@ def main_function(csv_file='output/measures.csv'):
         # ============= Case 3 ==================
         #  the cell is charged
 
-        # - charged_once = false
         # - v > too_low_voltage
         # we OPEN A NEW COLUMN and close the relay to discharge
         # print("End of charge", last_voltage, voltage, last_testing)
 
-        elif (
-            (charged_once[slot_id] == False)
-            and (voltage > too_low_voltage)
-            and (stagne[slot_id] == True)
-        ):
+        elif (voltage > too_low_voltage):
+
             close_relay(slot_id, slot_infos)
-            charged_once[slot_id] = True
             last_testing = False
-            stagne[slot_id] = False
             print("Case 3, End of charge")
 
 
@@ -294,8 +271,7 @@ def main_function(csv_file='output/measures.csv'):
         # print("Discharging", last_voltage, voltage, last_testing)
 
         elif (
-            (charged_once[slot_id] == True)
-            and (voltage >= discharged_voltage)
+            (voltage >= discharged_voltage)
             and (already_tested[slot_id] == False)
         ):
 
@@ -313,8 +289,7 @@ def main_function(csv_file='output/measures.csv'):
         # print("-----", last_voltage, voltage, last_testing)
 
         elif (
-            (charged_once[slot_id] == True)
-            and (voltage <= discharged_voltage)
+            (voltage <= discharged_voltage)
             and (voltage > voltage_empty_slot)
             and (already_tested[slot_id] == False)
         ):
@@ -386,7 +361,7 @@ def main_function(csv_file='output/measures.csv'):
 
             charged_twice[slot_id] = False
             already_tested[slot_id] = False
-            charged_once[slot_id] = False
+            
                 
 
 
